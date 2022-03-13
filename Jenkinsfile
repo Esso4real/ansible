@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'maven'
+    }
+
     environment {
 
         IMAGE_NAME = 'esso4real/java-maven-app:v1'
@@ -8,6 +12,12 @@ pipeline {
     }
 
     stages {  
+        stage('Build') {
+            steps {
+
+                sh "mvn -Dmaven.test.failure.ignore=true clean package"
+            }
+        }    
         stage('Build docker image') {
             steps {
                 script {
