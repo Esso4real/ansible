@@ -1,0 +1,40 @@
+---
+- name: Installing python3 and docker
+  hosts: all
+  become: yes
+  tasks:
+  - name: Installing python3 and docker
+    vars:
+      ansible_python_interpreter: /usr/bin/python
+    yum:
+      name:
+        - python3
+        - docker
+      update_cache: yes
+      state: present
+
+- name: start docker daemond
+  hosts: all
+  become: true
+  tasks:
+  - name: Starting docker daemond
+    systemd: 
+      name: docker 
+      state: started
+
+- name: Adding ec2-user to docker group
+  hosts: all
+  become: true
+  tasks:
+  - name: adding existing user user to group docker
+    user:
+     name: ec2-user
+     groups: docker
+     append: yes
+   
+- name: Running docker image
+  hosts: all
+  become: true
+  tasks:
+  - name: Running docker image
+    command: docker run -d -p 8080:8080 esso4real/java-maven-app:v1              
