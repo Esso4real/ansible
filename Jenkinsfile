@@ -55,11 +55,11 @@ pipeline {
                     //need to install another plugin which will ebables us to exec cmdline cmds on remote servers
                     //install ssh pipeline steps plugin
                          def remote = [:]
-                         remote.name = "ec2-user"
+                         remote.name = "eawangya"
                          remote.host = "${ANSIBLE_SERVER}"
                          remote.allowAnyHosts = true
 
-                         withCredentials([sshUserPrivateKey(credentialsId: 'ec2-server-key', keyFileVariable: 'keyfile', usernameVariable: 'user')]){
+                         withCredentials([sshUserPrivateKey(credentialsId: 'ansible-server-key', keyFileVariable: 'keyfile', usernameVariable: 'user')]){
                          remote.user = user
                          remote.identityFile = keyfile
                          sshCommand remote: remote, command: "ansible-playbook playbook.yaml"  
