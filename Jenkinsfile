@@ -7,8 +7,8 @@ pipeline {
 
     environment {
 
-        IMAGE_NAME = 'esso4real/java-maven-app:v1'
-        ANSIBLE_SERVER = "34.230.61.47"
+        IMAGE_NAME = 'esso4real/java-maven-app:v2'
+        ANSIBLE_SERVER = "10.0.0.195"
     }
 
     stages {  
@@ -37,10 +37,10 @@ pipeline {
            steps {
                script{
                    echo "copying files to ansible control node"
-                   sshagent(['ec2-server-key']) {
+                   sshagent(['ansible-server-key']) {
                       sh "scp -o StrictHostKeyChecking=no ansible/* ubuntu@${ANSIBLE_SERVER}:/home/ubuntu"
                        
-                      withCredentials([sshUserPrivateKey(credentialsId: 'ec2-server-key', keyFileVariable: 'keyfile', usernameVariable: 'user')]){
+                      withCredentials([sshUserPrivateKey(credentialsId: 'ansible-server-key', keyFileVariable: 'keyfile', usernameVariable: 'user')]){
                        sh 'scp $keyfile ubuntu@$ANSIBLE_SERVER:/home/ubuntu/ssh-key.pem'
                          } 
                        }
