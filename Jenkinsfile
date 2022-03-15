@@ -26,8 +26,8 @@ pipeline {
 
          stage('Provisioning server') {
             environment {
-                AWS_ACCESS_KEY_ID = "AKIA2L42SODENVQFDDIE"
-                AWS_SECRET_KEY_ID = "VjiWo+oSi9lAWDnB/kERmNTls2PcJfTPRXMQFtQ2"
+                AWS_ACCESS_KEY_ID = ""
+                AWS_SECRET_KEY_ID = ""
             }
             steps{
                 echo 'provisining ec2 instances .. ..  ...'
