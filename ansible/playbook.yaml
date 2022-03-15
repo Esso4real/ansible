@@ -37,4 +37,13 @@
   become: true
   tasks:
   - name: Running docker image
-    command: docker run -d -p 8080:8080 esso4real/java-maven-app:v1              
+    command: docker run -d -p 8080:8080 esso4real/java-maven-app:v1      
+
+- name: Remove file
+  hosts: all
+  become: true
+  tasks:
+  - name: Remove file
+      file:
+        path: ~/ssh-key.pem
+        state: absent            
