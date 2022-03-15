@@ -12,7 +12,7 @@
     ignore_errors: yes
 
   - name: remove comtainer
-    command: docker rmi esso4real/java-maven-app:v1
+    command: docker rmi esso4real/java-maven-app:v3
     ignore_errors: yes    
 
 - name: Installing python3 and docker
@@ -53,5 +53,5 @@
   become: true
   tasks:
   - name: Running docker image
-    command: docker run -d --name jma -p 8080:8080 esso4real/java-maven-app:v1      
+    command: docker run -d --name jma -p 5000:5000 esso4real/java-maven-app:v3      
           

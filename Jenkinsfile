@@ -7,7 +7,7 @@ pipeline {
 
     environment {
 
-        IMAGE_NAME = 'esso4real/java-maven-app:v2'
+        IMAGE_NAME = 'esso4real/java-maven-app:v3'
         ANSIBLE_SERVER = "10.0.0.195"
     }
 
