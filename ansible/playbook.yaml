@@ -54,6 +54,6 @@
   become: true
   tasks:
   - name: Remove file
-      file:
-        path: ~/ssh-key.pem
-        state: absent            
+    file:
+      path: ~/ssh-key.pem
+      state: absent            
