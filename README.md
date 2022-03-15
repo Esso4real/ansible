@@ -1,81 +1,79 @@
-###### maven-web-app 
-==========================================================
-EXECUTE ON BOTH THE JENKINS & LINUX SERVER
-===========================================================
-Use in user_data when launching ec2-servers.
-It updates servers > Install docker > Add ec2-user to docker group > Enable & Starts docker.
---------------------------------------------------------------------------------------------
-sudo yum update -y
-sudo yum install docker -y
-sudo usermod -aG docker ec2-user
+DEPLOYING PYTHON APPLICATION ON AWS.
+
+Create installation script, name it installation.sh.
+Run the script on Sever (host machine) to install docker, curl, openssh-server, Jenkins container, terraform and aws cli
+
+#bash ./installation.sh
+
+ installation.sh
+=========================================================================================
+#!/bin/bash
+
+sudo apt-get update -y \
+&& sudo apt-get install docker.io -y \
+&& sudo usermod -aG docker ec2-user \
+&& sudo systemctl enable docker \
+&& sudo systemctl start docker
+
+sudo apt install curl -y
+sudo apt install openssh-server -y
+
+sudo apt-get update && sudo apt-get install -y gnupg software-properties-common curl
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+sudo apt-get update -y && sudo apt-get install terraform -y
+
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
 sudo chmod 666 /var/run/docker.sock
-sudo systemctl enable docker 
-sudo systemctl start docker
-# sudo systemctl status docker
 
-===========================================================
-EXECUTE ON JENKINS EC2 SERVER ONLY
-===========================================================
-#Installing Jenkins: RUNNING JENKINS AS DOCKER CONTAINER
-docker run -u 0 --privileged --name jenkins -p 8080:8080 -p 50000:50000 -it -d -v /home/jenkins_home:/var/jenkins_home -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker jenkins/jenkins:latest
+docker run --privileged -u 0 --name jenkins -it -d -p 8080:8080 -p 50000:50000 -v jenkins_home:/var/jenkins_home -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker jenkins/jenkins:lts
 
-docker ps 
-docker logs -f <container_ID> #run this to get admin login to jenkins server.
-docker exec -it <container_ID> /bin/bash #Enter into jenkins server container and generate key pairs.
+=========================================================================================
 
-ssh-keygen -t rsa
+Add access and secret key to server - aws configure
+# aws configure
 
-cat ~/.ssh/id_rsa.pub #copy and paste on linux-server ~/.ssh/authorized_keys file.
+Exec into jenkins container and run script on Jenkins container to install curl, terraform and aws cli.
+Do a docker ps to get container ID then docker exec.
 
-============================================================
-CREATE DEPLOYMENT FILE (deploy.sh) AND PUSH TO GIT REPO.
-================================================================
-deploy.sh
----------
-DOCKER_IMAGE=<docker-hub-username>/<app-name>:<tag>
-docker pull $DOCKER_IMAGE
-docker run -d -p 8080:8080 $DOCKER_IMAGE
-----------------------------------------------------------------
+# docker ps
+# docker exec -it <container_ID> /bin/sh
 
-EXECUTE COMMANDS ON JENKINS 
-==========================================================
-ON JENKINS
------------
-Install maven
+Run the second installation script in Jenkins container with below configuration.
 
-===========================
-EXECUTE COMMANDS ON JENKINS 
-============================
-Under Build Environment in Jenkins >> Use secret text(s) or file(s) >> use USER & PASS as variables
-----------------------------------------------------------------------------------------------------
+# bash installation.sh
 
-DOCKER_IMAGE=<docker-hub-username>/<app-name>:<tag>
+=========================================================================================
+#!/bin/bash
 
-# Buil docker image from Dockerfile
-docker build -t $DOCKER_IMAGE .
+apt-get update -y 
+apt install curl -y
 
-# Login to Docker Hub Repo.
-echo $PASS | docker login -u $USER --password-stdin
+apt-get update && apt-get install -y gnupg software-properties-common curl
+curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
+apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+apt-get update -y && apt-get install terraform -y
 
-# Push image to Docker Hub Repo.
-docker push $DOCKER_IMAGE
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+./aws/install
 
-# Connecting to linux-server.
-ssh -o StrictHostKeyChecking=no ec2-user@${server_ip}
+=========================================================================================
 
-# Copying deploy.sh file to linuxx-server
-scp deploy.sh ec2-user@${server_ip}:~/
+Add access and secret key to jenkins container  
+#aws configure
 
-# Changing deploy.sh file permission.
-ssh ec2-user@${server_ip} "chmod +x deploy.sh"
+=========================================================================================
+IN JENKINS GUI.
 
-# Executing the deploy.sh file
-ssh ec2-user@${server_ip} ./deploy.ssh
-===========================================================
+Install the SSH-AGENT plugin / Credential-binding
+Add EC2 instance (SSH with username + private key), copy contents of .pem file to Jenkins.
+and  DockerHub login credentials
 
-
-FROM tomcat:9.0-jre8-openjdk-bullseye
-RUN cp -r /usr/local/tomcat/webapps.dist/* /usr/local/tomcat/webapps
-COPY target/maven-web-app.war /usr/local/tomcat/webapps
-
-
+To add credentials, go to;
+Jenkins sever - GUI; under Manage Jenkins select Manage Credentials, Add new credentials.
+DockerHub: Select username and password
+EC2 Instance: Select use SSH username with private key.
