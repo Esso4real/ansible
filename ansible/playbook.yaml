@@ -1,4 +1,23 @@
 ---
+- name: stop and remove container
+  host: all
+  become: yes
+  tasks:
+  - name: stop existing container
+    command: docker stop esso4real/java-maven-app:v1
+
+  - name: remove comtainer
+    command: docker rm esso4real/java-maven-app:v1
+
+- name: Remove file
+  hosts: all
+  become: true
+  tasks:
+  - name: Remove file
+      file:
+        path: ~/ssh-key.pem
+        state: absent 
+
 - name: Installing python3 and docker
   hosts: all
   become: yes
