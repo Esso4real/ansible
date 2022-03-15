@@ -1,23 +1,12 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'maven'
-    }
-
     environment {
 
         IMAGE_NAME = 'esso4real/java-maven-app:v3'
         ANSIBLE_SERVER = "10.0.0.195"
     }
 
-    stages {  
-        stage('Build') {
-            steps {
-
-                sh "mvn -Dmaven.test.failure.ignore=true clean package"
-            }
-        }    
         stage('Build docker image') {
             steps {
                 script {
@@ -32,7 +21,33 @@ pipeline {
                     }
                 }
             }
-        }  
+        } 
+
+         stage('Provisioning server') {
+            environment {
+                AWS_ACCESS_KEY_ID = "AKIA2L42SODENVQFDDIE"
+                AWS_SECRET_KEY_ID = "VjiWo+oSi9lAWDnB/kERmNTls2PcJfTPRXMQFtQ2"
+            }
+            steps{
+                echo 'provisining ec2 instances .. ..  ...'
+                script{
+                    dir('terraform') {
+                    sh "terraform init"
+                    sh "terraform apply --auto-approve"
+                    //sh "terraform destroy --auto-approve"
+                    
+                    EC2_LINUX_IP = sh(
+                        script: "terraform output ec2_public_ip",
+                        returnStdout: true
+                    ).trim()
+    
+                }
+            }
+        }
+    }   
+
+
+
         stage("copy files to ansible server") {
            steps {
                script{
