@@ -1,6 +1,6 @@
 ---
 - name: stop and remove container
-  host: all
+  hosts: all
   become: yes
   tasks:
   - name: stop existing container
