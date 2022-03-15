@@ -55,7 +55,7 @@ pipeline {
                     //need to install another plugin which will ebables us to exec cmdline cmds on remote servers
                     //install ssh pipeline steps plugin
                          def remote = [:]
-                         remote.name = "ansible-server"
+                         remote.name = "ec2-user"
                          remote.host = "${ANSIBLE_SERVER}"
                          remote.allowAnyHosts = true
 
