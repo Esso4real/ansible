@@ -4,10 +4,10 @@
   become: yes
   tasks:
   - name: stop existing container
-    command: docker stop esso4real/java-maven-app:v1
+    command: docker stop jma
 
   - name: remove comtainer
-    command: docker rm esso4real/java-maven-app:v1
+    command: docker rm jma
 
 - name: Installing python3 and docker
   hosts: all
@@ -47,7 +47,7 @@
   become: true
   tasks:
   - name: Running docker image
-    command: docker run -d -p 8080:8080 esso4real/java-maven-app:v1      
+    command: docker run -d --name jma -p 8080:8080 esso4real/java-maven-app:v1      
 
 - name: Remove file
   hosts: all
