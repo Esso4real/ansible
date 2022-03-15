@@ -11,6 +11,10 @@
     command: docker rm jma
     ignore_errors: yes
 
+  - name: remove comtainer
+    command: docker rmi esso4real/java-maven-app:v1
+    ignore_errors: yes    
+
 - name: Installing python3 and docker
   hosts: all
   become: yes
