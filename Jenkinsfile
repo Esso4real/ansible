@@ -3,7 +3,7 @@ pipeline {
 
     environment {
 
-        IMAGE_NAME = 'esso4real/java-maven-app:v3'
+        IMAGE_NAME = 'esso4real/python-app:v5'
         ANSIBLE_SERVER = "172.16.26.144"
     }
      
@@ -34,8 +34,8 @@ pipeline {
                 script{
                     dir('terraform') {
                     sh "terraform init"
-                    //sh "terraform apply --auto-approve"
-                    sh "terraform destroy --auto-approve"
+                    sh "terraform apply --auto-approve"
+                    //sh "terraform destroy --auto-approve"
                     
                     EC2_LINUX_IP = sh(
                         script: "terraform output ec2_public_ip",
